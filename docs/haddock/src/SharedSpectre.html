@@ -1,0 +1,567 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# OPTIONS_GHC -Wall #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE CPP                      #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE ForeignFunctionInterface #-}</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- | Exported Functions for Spectre Interaction</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SharedSpectre</span><span> </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="SharedSpectre.html#version"><span class="hs-identifier">version</span></a></span><span>
+</span><span id="line-8"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#simulate"><span class="hs-identifier">simulate</span></a></span><span>
+</span><span id="line-9"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#numOfPlots"><span class="hs-identifier">numOfPlots</span></a></span><span>
+</span><span id="line-10"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#nameOfPlot"><span class="hs-identifier">nameOfPlot</span></a></span><span>
+</span><span id="line-11"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#plotByName"><span class="hs-identifier">plotByName</span></a></span><span>
+</span><span id="line-12"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#plotByIndex"><span class="hs-identifier">plotByIndex</span></a></span><span>
+</span><span id="line-13"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#numOfVars"><span class="hs-identifier">numOfVars</span></a></span><span>
+</span><span id="line-14"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#nameOfVar"><span class="hs-identifier">nameOfVar</span></a></span><span>
+</span><span id="line-15"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#numOfPoints"><span class="hs-identifier">numOfPoints</span></a></span><span>
+</span><span id="line-16"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#waveByName"><span class="hs-identifier">waveByName</span></a></span><span>
+</span><span id="line-17"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#waveByIndex"><span class="hs-identifier">waveByIndex</span></a></span><span>
+</span><span id="line-18"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#isComplex"><span class="hs-identifier">isComplex</span></a></span><span>
+</span><span id="line-19"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#realData"><span class="hs-identifier">realData</span></a></span><span>
+</span><span id="line-20"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#imagData"><span class="hs-identifier">imagData</span></a></span><span>
+</span><span id="line-21"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#startSession"><span class="hs-identifier">startSession</span></a></span><span>
+</span><span id="line-22"></span><span>                     </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SharedSpectre.html#stopSession"><span class="hs-identifier">stopSession</span></a></span><span>
+</span><span id="line-23"></span><span>                     </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Spectre</span></span><span>               </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">S</span></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Spectre.Interactive</span></span><span>   </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SI</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Complex</span></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span>              </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span>                 </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fromJust</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.NutMeg</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Vector.Unboxed</span></span><span>   </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">V</span></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Foreign.C.String</span></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Foreign.C.Types</span></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Foreign.Ptr</span></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Foreign.StablePtr</span></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Foreign.Marshal.Array</span></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- | Get Spectre Version</span><span>
+</span><span id="line-39"></span><span class="annot"><a href="SharedSpectre.html#version"><span class="hs-identifier hs-type">version</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span>
+</span><span id="line-40"></span><span id="version"><span class="annot"><span class="annottext">version :: IO CString
+</span><a href="SharedSpectre.html#version"><span class="hs-identifier hs-var hs-var">version</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO String
+</span><span class="hs-identifier hs-var">S.version</span></span><span> </span><span class="annot"><span class="annottext">IO String -&gt; (String -&gt; IO CString) -&gt; IO CString
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; IO CString
+</span><span class="hs-identifier hs-var">newCString</span></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="annot"><a href="SharedSpectre.html#marshal%27"><span class="hs-identifier hs-type">marshal'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span id="marshal%27"><span class="annot"><span class="annottext">marshal' :: Ptr CString -&gt; CInt -&gt; CString -&gt; IO ([String], String)
+</span><a href="SharedSpectre.html#marshal%27"><span class="hs-identifier hs-var hs-var">marshal'</span></a></span></span><span> </span><span id="local-6989586621679043847"><span class="annot"><span class="annottext">Ptr CString
+</span><a href="#local-6989586621679043847"><span class="hs-identifier hs-var">includes</span></a></span></span><span> </span><span id="local-6989586621679043846"><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043846"><span class="hs-identifier hs-var">len</span></a></span></span><span> </span><span id="local-6989586621679043845"><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043845"><span class="hs-identifier hs-var">netlist</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-44"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679043844"><span class="annot"><span class="annottext">len' :: Int
+</span><a href="#local-6989586621679043844"><span class="hs-identifier hs-var hs-var">len'</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Int
+forall a. Num a =&gt; Integer -&gt; a
+</span><span class="hs-identifier hs-var">fromInteger</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Int) -&gt; Integer -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CInt -&gt; Integer
+forall a. Integral a =&gt; a -&gt; Integer
+</span><span class="hs-identifier hs-var">toInteger</span></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043846"><span class="hs-identifier hs-var">len</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-45"></span><span>    </span><span id="local-6989586621679043843"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679043843"><span class="hs-identifier hs-var">netlist'</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">CString -&gt; IO String
+</span><span class="hs-identifier hs-var">peekCString</span></span><span> </span><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043845"><span class="hs-identifier hs-var">netlist</span></a></span><span>
+</span><span id="line-46"></span><span>    </span><span id="local-6989586621679043841"><span class="annot"><span class="annottext">[IO String]
+</span><a href="#local-6989586621679043841"><span class="hs-identifier hs-var">includes''</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(CString -&gt; IO String) -&gt; [CString] -&gt; [IO String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">CString -&gt; IO String
+</span><span class="hs-identifier hs-var">peekCString</span></span><span> </span><span class="annot"><span class="annottext">([CString] -&gt; [IO String]) -&gt; IO [CString] -&gt; IO [IO String]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Ptr CString -&gt; IO [CString]
+forall a. Storable a =&gt; Int -&gt; Ptr a -&gt; IO [a]
+</span><span class="hs-identifier hs-var">peekArray</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679043844"><span class="hs-identifier hs-var">len'</span></a></span><span> </span><span class="annot"><span class="annottext">Ptr CString
+</span><a href="#local-6989586621679043847"><span class="hs-identifier hs-var">includes</span></a></span><span>
+</span><span id="line-47"></span><span>    </span><span id="local-6989586621679043838"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679043838"><span class="hs-identifier hs-var">includes'</span></a></span></span><span>  </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[IO String] -&gt; IO [String]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a.
+(Traversable t, Monad m) =&gt;
+t (m a) -&gt; m (t a)
+</span><span class="hs-identifier hs-var">sequence</span></span><span> </span><span class="annot"><span class="annottext">[IO String]
+</span><a href="#local-6989586621679043841"><span class="hs-identifier hs-var">includes''</span></a></span><span>
+</span><span id="line-48"></span><span>    </span><span class="annot"><span class="annottext">([String], String) -&gt; IO ([String], String)
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679043838"><span class="hs-identifier hs-var">includes'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679043843"><span class="hs-identifier hs-var">netlist'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-comment">-- | Run a Simulation</span><span>
+</span><span id="line-51"></span><span class="annot"><a href="SharedSpectre.html#simulate"><span class="hs-identifier hs-type">simulate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span id="simulate"><span class="annot"><span class="annottext">simulate :: Ptr CString -&gt; CInt -&gt; CString -&gt; IO (StablePtr NutMeg)
+</span><a href="SharedSpectre.html#simulate"><span class="hs-identifier hs-var hs-var">simulate</span></a></span></span><span> </span><span id="local-6989586621679043836"><span class="annot"><span class="annottext">Ptr CString
+</span><a href="#local-6989586621679043836"><span class="hs-identifier hs-var">includes</span></a></span></span><span> </span><span id="local-6989586621679043835"><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043835"><span class="hs-identifier hs-var">len</span></a></span></span><span> </span><span id="local-6989586621679043834"><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043834"><span class="hs-identifier hs-var">netlist</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Ptr CString -&gt; CInt -&gt; CString -&gt; IO ([String], String)
+</span><a href="SharedSpectre.html#marshal%27"><span class="hs-identifier hs-var">marshal'</span></a></span><span> </span><span class="annot"><span class="annottext">Ptr CString
+</span><a href="#local-6989586621679043836"><span class="hs-identifier hs-var">includes</span></a></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043835"><span class="hs-identifier hs-var">len</span></a></span><span> </span><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043834"><span class="hs-identifier hs-var">netlist</span></a></span><span>
+</span><span id="line-53"></span><span>                                    </span><span class="annot"><span class="annottext">IO ([String], String)
+-&gt; (([String], String) -&gt; IO NutMeg) -&gt; IO NutMeg
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String -&gt; IO NutMeg)
+-&gt; ([String], String) -&gt; IO NutMeg
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><span class="hs-identifier hs-var">uncurry</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String -&gt; IO NutMeg
+</span><span class="hs-identifier hs-var">S.simulate</span></span><span>
+</span><span id="line-54"></span><span>                                    </span><span class="annot"><span class="annottext">IO NutMeg
+-&gt; (NutMeg -&gt; IO (StablePtr NutMeg)) -&gt; IO (StablePtr NutMeg)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">NutMeg -&gt; IO (StablePtr NutMeg)
+forall a. a -&gt; IO (StablePtr a)
+</span><span class="hs-identifier hs-var">newStablePtr</span></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="hs-comment">-- | Launch an interactive session</span><span>
+</span><span id="line-57"></span><span class="annot"><a href="SharedSpectre.html#startSession"><span class="hs-identifier hs-type">startSession</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SI.Session</span></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span id="startSession"><span class="annot"><span class="annottext">startSession :: Ptr CString -&gt; CInt -&gt; CString -&gt; IO (StablePtr Session)
+</span><a href="SharedSpectre.html#startSession"><span class="hs-identifier hs-var hs-var">startSession</span></a></span></span><span> </span><span id="local-6989586621679043831"><span class="annot"><span class="annottext">Ptr CString
+</span><a href="#local-6989586621679043831"><span class="hs-identifier hs-var">includes</span></a></span></span><span> </span><span id="local-6989586621679043830"><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043830"><span class="hs-identifier hs-var">len</span></a></span></span><span> </span><span id="local-6989586621679043829"><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043829"><span class="hs-identifier hs-var">netlist</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Ptr CString -&gt; CInt -&gt; CString -&gt; IO ([String], String)
+</span><a href="SharedSpectre.html#marshal%27"><span class="hs-identifier hs-var">marshal'</span></a></span><span> </span><span class="annot"><span class="annottext">Ptr CString
+</span><a href="#local-6989586621679043831"><span class="hs-identifier hs-var">includes</span></a></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043830"><span class="hs-identifier hs-var">len</span></a></span><span> </span><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043829"><span class="hs-identifier hs-var">netlist</span></a></span><span>
+</span><span id="line-59"></span><span>                                        </span><span class="annot"><span class="annottext">IO ([String], String)
+-&gt; (([String], String) -&gt; IO Session) -&gt; IO Session
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String -&gt; IO Session)
+-&gt; ([String], String) -&gt; IO Session
+forall a b c. (a -&gt; b -&gt; c) -&gt; (a, b) -&gt; c
+</span><span class="hs-identifier hs-var">uncurry</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String -&gt; IO Session
+</span><span class="hs-identifier hs-var">SI.initSession</span></span><span>
+</span><span id="line-60"></span><span>                                        </span><span class="annot"><span class="annottext">IO Session
+-&gt; (Session -&gt; IO (StablePtr Session)) -&gt; IO (StablePtr Session)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Session -&gt; IO (StablePtr Session)
+forall a. a -&gt; IO (StablePtr a)
+</span><span class="hs-identifier hs-var">newStablePtr</span></span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- | Quit Spectre Interactive Session</span><span>
+</span><span id="line-63"></span><span class="annot"><a href="SharedSpectre.html#stopSession"><span class="hs-identifier hs-type">stopSession</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SI.Session</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span id="stopSession"><span class="annot"><span class="annottext">stopSession :: StablePtr Session -&gt; IO ()
+</span><a href="SharedSpectre.html#stopSession"><span class="hs-identifier hs-var hs-var">stopSession</span></a></span></span><span> </span><span id="local-6989586621679043827"><span class="annot"><span class="annottext">StablePtr Session
+</span><a href="#local-6989586621679043827"><span class="hs-identifier hs-var">session</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StablePtr Session -&gt; IO Session
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr Session
+</span><a href="#local-6989586621679043827"><span class="hs-identifier hs-var">session</span></a></span><span> </span><span class="annot"><span class="annottext">IO Session -&gt; (Session -&gt; IO ()) -&gt; IO ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Session -&gt; IO ()
+</span><span class="hs-identifier hs-var">SI.exitSession</span></span><span> </span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- | Number of Plots in the nutmeg object</span><span>
+</span><span id="line-67"></span><span class="annot"><a href="SharedSpectre.html#numOfPlots"><span class="hs-identifier hs-type">numOfPlots</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-68"></span><span id="numOfPlots"><span class="annot"><span class="annottext">numOfPlots :: StablePtr NutMeg -&gt; IO CInt
+</span><a href="SharedSpectre.html#numOfPlots"><span class="hs-identifier hs-var hs-var">numOfPlots</span></a></span></span><span> </span><span id="local-6989586621679043824"><span class="annot"><span class="annottext">StablePtr NutMeg
+</span><a href="#local-6989586621679043824"><span class="hs-identifier hs-var">nut</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-69"></span><span>    </span><span id="local-6989586621679043823"><span class="annot"><span class="annottext">NutMeg
+</span><a href="#local-6989586621679043823"><span class="hs-identifier hs-var">nut'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg -&gt; IO NutMeg
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg
+</span><a href="#local-6989586621679043824"><span class="hs-identifier hs-var">nut</span></a></span><span>
+</span><span id="line-70"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679043822"><span class="annot"><span class="annottext">num :: CInt
+</span><a href="#local-6989586621679043822"><span class="hs-identifier hs-var hs-var">num</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; CInt
+forall a. Num a =&gt; Integer -&gt; a
+</span><span class="hs-identifier hs-var">fromInteger</span></span><span class="annot"><span class="annottext">(Integer -&gt; CInt)
+-&gt; (Map String NutPlot -&gt; Integer) -&gt; Map String NutPlot -&gt; CInt
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Integer
+forall a. Integral a =&gt; a -&gt; Integer
+</span><span class="hs-identifier hs-var">toInteger</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Integer)
+-&gt; (Map String NutPlot -&gt; Int) -&gt; Map String NutPlot -&gt; Integer
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Map String NutPlot -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">(Map String NutPlot -&gt; CInt) -&gt; Map String NutPlot -&gt; CInt
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NutMeg -&gt; Map String NutPlot
+</span><span class="hs-identifier hs-var hs-var">nutPlots</span></span><span> </span><span class="annot"><span class="annottext">NutMeg
+</span><a href="#local-6989586621679043823"><span class="hs-identifier hs-var">nut'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-71"></span><span>    </span><span class="annot"><span class="annottext">CInt -&gt; IO CInt
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043822"><span class="hs-identifier hs-var">num</span></a></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span class="hs-comment">-- | Name of Nut Plot at given index</span><span>
+</span><span id="line-74"></span><span class="annot"><a href="SharedSpectre.html#nameOfPlot"><span class="hs-identifier hs-type">nameOfPlot</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span>
+</span><span id="line-75"></span><span id="nameOfPlot"><span class="annot"><span class="annottext">nameOfPlot :: StablePtr NutMeg -&gt; CInt -&gt; IO CString
+</span><a href="SharedSpectre.html#nameOfPlot"><span class="hs-identifier hs-var hs-var">nameOfPlot</span></a></span></span><span> </span><span id="local-6989586621679043818"><span class="annot"><span class="annottext">StablePtr NutMeg
+</span><a href="#local-6989586621679043818"><span class="hs-identifier hs-var">nut</span></a></span></span><span> </span><span id="local-6989586621679043817"><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043817"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-76"></span><span>    </span><span id="local-6989586621679043816"><span class="annot"><span class="annottext">NutMeg
+</span><a href="#local-6989586621679043816"><span class="hs-identifier hs-var">nut'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg -&gt; IO NutMeg
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg
+</span><a href="#local-6989586621679043818"><span class="hs-identifier hs-var">nut</span></a></span><span>
+</span><span id="line-77"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679043815"><span class="annot"><span class="annottext">idx' :: Int
+</span><a href="#local-6989586621679043815"><span class="hs-identifier hs-var hs-var">idx'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Int
+forall a. Num a =&gt; Integer -&gt; a
+</span><span class="hs-identifier hs-var">fromInteger</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Int) -&gt; Integer -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CInt -&gt; Integer
+forall a. Integral a =&gt; a -&gt; Integer
+</span><span class="hs-identifier hs-var">toInteger</span></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043817"><span class="hs-identifier hs-var">idx</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-78"></span><span>        </span><span id="local-6989586621679043814"><span class="annot"><span class="annottext">name :: String
+</span><a href="#local-6989586621679043814"><span class="hs-identifier hs-var hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String] -&gt; Int -&gt; String
+forall a. [a] -&gt; Int -&gt; a
+</span><span class="hs-operator hs-var">!!</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679043815"><span class="hs-identifier hs-var">idx'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String)
+-&gt; (Map String NutPlot -&gt; [String]) -&gt; Map String NutPlot -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Map String NutPlot -&gt; [String]
+forall k a. Map k a -&gt; [k]
+</span><span class="hs-identifier hs-var">M.keys</span></span><span> </span><span class="annot"><span class="annottext">(Map String NutPlot -&gt; String) -&gt; Map String NutPlot -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>  </span><span class="annot"><span class="annottext">NutMeg -&gt; Map String NutPlot
+</span><span class="hs-identifier hs-var hs-var">nutPlots</span></span><span> </span><span class="annot"><span class="annottext">NutMeg
+</span><a href="#local-6989586621679043816"><span class="hs-identifier hs-var">nut'</span></a></span><span>
+</span><span id="line-79"></span><span>    </span><span class="annot"><span class="annottext">String -&gt; IO CString
+</span><span class="hs-identifier hs-var">newCString</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679043814"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="hs-comment">-- | Get Plot by given name</span><span>
+</span><span id="line-82"></span><span class="annot"><a href="SharedSpectre.html#plotByName"><span class="hs-identifier hs-type">plotByName</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span class="hs-special">)</span><span>
+</span><span id="line-83"></span><span id="plotByName"><span class="annot"><span class="annottext">plotByName :: StablePtr NutMeg -&gt; CString -&gt; IO (StablePtr NutPlot)
+</span><a href="SharedSpectre.html#plotByName"><span class="hs-identifier hs-var hs-var">plotByName</span></a></span></span><span> </span><span id="local-6989586621679043811"><span class="annot"><span class="annottext">StablePtr NutMeg
+</span><a href="#local-6989586621679043811"><span class="hs-identifier hs-var">nut</span></a></span></span><span> </span><span id="local-6989586621679043810"><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043810"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-84"></span><span>    </span><span id="local-6989586621679043809"><span class="annot"><span class="annottext">NutMeg
+</span><a href="#local-6989586621679043809"><span class="hs-identifier hs-var">nut'</span></a></span></span><span>  </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg -&gt; IO NutMeg
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg
+</span><a href="#local-6989586621679043811"><span class="hs-identifier hs-var">nut</span></a></span><span>
+</span><span id="line-85"></span><span>    </span><span id="local-6989586621679043808"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679043808"><span class="hs-identifier hs-var">name'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">CString -&gt; IO String
+</span><span class="hs-identifier hs-var">peekCString</span></span><span> </span><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043810"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-86"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679043807"><span class="annot"><span class="annottext">plt' :: NutPlot
+</span><a href="#local-6989586621679043807"><span class="hs-identifier hs-var hs-var">plt'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe NutPlot -&gt; NutPlot
+forall a. HasCallStack =&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromJust</span></span><span> </span><span class="annot"><span class="annottext">(Maybe NutPlot -&gt; NutPlot)
+-&gt; (Map String NutPlot -&gt; Maybe NutPlot)
+-&gt; Map String NutPlot
+-&gt; NutPlot
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Map String NutPlot -&gt; Maybe NutPlot
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">M.lookup</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679043808"><span class="hs-identifier hs-var">name'</span></a></span><span> </span><span class="annot"><span class="annottext">(Map String NutPlot -&gt; NutPlot) -&gt; Map String NutPlot -&gt; NutPlot
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NutMeg -&gt; Map String NutPlot
+</span><span class="hs-identifier hs-var hs-var">nutPlots</span></span><span> </span><span class="annot"><span class="annottext">NutMeg
+</span><a href="#local-6989586621679043809"><span class="hs-identifier hs-var">nut'</span></a></span><span>
+</span><span id="line-87"></span><span>    </span><span class="annot"><span class="annottext">NutPlot -&gt; IO (StablePtr NutPlot)
+forall a. a -&gt; IO (StablePtr a)
+</span><span class="hs-identifier hs-var">newStablePtr</span></span><span> </span><span class="annot"><span class="annottext">NutPlot
+</span><a href="#local-6989586621679043807"><span class="hs-identifier hs-var">plt'</span></a></span><span>
+</span><span id="line-88"></span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- | Get Plot at given Index</span><span>
+</span><span id="line-90"></span><span class="annot"><a href="SharedSpectre.html#plotByIndex"><span class="hs-identifier hs-type">plotByIndex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span><span id="plotByIndex"><span class="annot"><span class="annottext">plotByIndex :: StablePtr NutMeg -&gt; CInt -&gt; IO (StablePtr NutPlot)
+</span><a href="SharedSpectre.html#plotByIndex"><span class="hs-identifier hs-var hs-var">plotByIndex</span></a></span></span><span> </span><span id="local-6989586621679043805"><span class="annot"><span class="annottext">StablePtr NutMeg
+</span><a href="#local-6989586621679043805"><span class="hs-identifier hs-var">nut</span></a></span></span><span> </span><span id="local-6989586621679043804"><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043804"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg -&gt; CInt -&gt; IO CString
+</span><a href="SharedSpectre.html#nameOfPlot"><span class="hs-identifier hs-var">nameOfPlot</span></a></span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg
+</span><a href="#local-6989586621679043805"><span class="hs-identifier hs-var">nut</span></a></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043804"><span class="hs-identifier hs-var">idx</span></a></span><span> </span><span class="annot"><span class="annottext">IO CString
+-&gt; (CString -&gt; IO (StablePtr NutPlot)) -&gt; IO (StablePtr NutPlot)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg -&gt; CString -&gt; IO (StablePtr NutPlot)
+</span><a href="SharedSpectre.html#plotByName"><span class="hs-identifier hs-var">plotByName</span></a></span><span> </span><span class="annot"><span class="annottext">StablePtr NutMeg
+</span><a href="#local-6989586621679043805"><span class="hs-identifier hs-var">nut</span></a></span><span> </span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- | Number of Variables in the nutplot</span><span>
+</span><span id="line-94"></span><span class="annot"><a href="SharedSpectre.html#numOfVars"><span class="hs-identifier hs-type">numOfVars</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-95"></span><span id="numOfVars"><span class="annot"><span class="annottext">numOfVars :: StablePtr NutPlot -&gt; IO CInt
+</span><a href="SharedSpectre.html#numOfVars"><span class="hs-identifier hs-var hs-var">numOfVars</span></a></span></span><span> </span><span id="local-6989586621679043803"><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043803"><span class="hs-identifier hs-var">plt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-96"></span><span>    </span><span id="local-6989586621679043802"><span class="annot"><span class="annottext">NutPlot
+</span><a href="#local-6989586621679043802"><span class="hs-identifier hs-var">plt'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot -&gt; IO NutPlot
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043803"><span class="hs-identifier hs-var">plt</span></a></span><span>
+</span><span id="line-97"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679043801"><span class="annot"><span class="annottext">num :: CInt
+</span><a href="#local-6989586621679043801"><span class="hs-identifier hs-var hs-var">num</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; CInt
+forall a. Num a =&gt; Integer -&gt; a
+</span><span class="hs-identifier hs-var">fromInteger</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; CInt) -&gt; (Int -&gt; Integer) -&gt; Int -&gt; CInt
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Integer
+forall a. Integral a =&gt; a -&gt; Integer
+</span><span class="hs-identifier hs-var">toInteger</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; CInt) -&gt; Int -&gt; CInt
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NutPlot -&gt; Int
+</span><span class="hs-identifier hs-var hs-var">nutNumVars</span></span><span> </span><span class="annot"><span class="annottext">NutPlot
+</span><a href="#local-6989586621679043802"><span class="hs-identifier hs-var">plt'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-98"></span><span>    </span><span class="annot"><span class="annottext">String -&gt; IO ()
+</span><span class="hs-identifier hs-var">putStrLn</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ()) -&gt; String -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Number of Vars: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">CInt -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043801"><span class="hs-identifier hs-var">num</span></a></span><span>
+</span><span id="line-99"></span><span>    </span><span class="annot"><span class="annottext">CInt -&gt; IO CInt
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043801"><span class="hs-identifier hs-var">num</span></a></span><span>
+</span><span id="line-100"></span><span>
+</span><span id="line-101"></span><span class="hs-comment">-- numOfVars plt = fromInteger . toInteger . nutNumVars &lt;$&gt; deRefStablePtr plt</span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- | Name of the variable at given index</span><span>
+</span><span id="line-104"></span><span class="annot"><a href="SharedSpectre.html#nameOfVar"><span class="hs-identifier hs-type">nameOfVar</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span>
+</span><span id="line-105"></span><span id="nameOfVar"><span class="annot"><span class="annottext">nameOfVar :: StablePtr NutPlot -&gt; CInt -&gt; IO CString
+</span><a href="SharedSpectre.html#nameOfVar"><span class="hs-identifier hs-var hs-var">nameOfVar</span></a></span></span><span> </span><span id="local-6989586621679043797"><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043797"><span class="hs-identifier hs-var">plt</span></a></span></span><span> </span><span id="local-6989586621679043796"><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043796"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-106"></span><span>    </span><span id="local-6989586621679043795"><span class="annot"><span class="annottext">NutPlot
+</span><a href="#local-6989586621679043795"><span class="hs-identifier hs-var">plt'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot -&gt; IO NutPlot
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043797"><span class="hs-identifier hs-var">plt</span></a></span><span>
+</span><span id="line-107"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679043794"><span class="annot"><span class="annottext">idx' :: Int
+</span><a href="#local-6989586621679043794"><span class="hs-identifier hs-var hs-var">idx'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Int
+forall a. Num a =&gt; Integer -&gt; a
+</span><span class="hs-identifier hs-var">fromInteger</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Int) -&gt; Integer -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CInt -&gt; Integer
+forall a. Integral a =&gt; a -&gt; Integer
+</span><span class="hs-identifier hs-var">toInteger</span></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043796"><span class="hs-identifier hs-var">idx</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-108"></span><span>        </span><span id="local-6989586621679043793"><span class="annot"><span class="annottext">name :: String
+</span><a href="#local-6989586621679043793"><span class="hs-identifier hs-var hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String] -&gt; Int -&gt; String
+forall a. [a] -&gt; Int -&gt; a
+</span><span class="hs-operator hs-var">!!</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679043794"><span class="hs-identifier hs-var">idx'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; [String] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NutPlot -&gt; [String]
+</span><span class="hs-identifier hs-var hs-var">nutVariables</span></span><span> </span><span class="annot"><span class="annottext">NutPlot
+</span><a href="#local-6989586621679043795"><span class="hs-identifier hs-var">plt'</span></a></span><span>
+</span><span id="line-109"></span><span>    </span><span class="annot"><span class="annottext">String -&gt; IO CString
+</span><span class="hs-identifier hs-var">newCString</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679043793"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-110"></span><span>
+</span><span id="line-111"></span><span class="hs-comment">-- | Number of points in Waves</span><span>
+</span><span id="line-112"></span><span class="annot"><a href="SharedSpectre.html#numOfPoints"><span class="hs-identifier hs-type">numOfPoints</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-113"></span><span id="numOfPoints"><span class="annot"><span class="annottext">numOfPoints :: StablePtr NutPlot -&gt; IO CInt
+</span><a href="SharedSpectre.html#numOfPoints"><span class="hs-identifier hs-var hs-var">numOfPoints</span></a></span></span><span> </span><span id="local-6989586621679043791"><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043791"><span class="hs-identifier hs-var">plt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; CInt
+forall a. Num a =&gt; Integer -&gt; a
+</span><span class="hs-identifier hs-var">fromInteger</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; CInt) -&gt; (NutPlot -&gt; Integer) -&gt; NutPlot -&gt; CInt
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Integer
+forall a. Integral a =&gt; a -&gt; Integer
+</span><span class="hs-identifier hs-var">toInteger</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Integer) -&gt; (NutPlot -&gt; Int) -&gt; NutPlot -&gt; Integer
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">NutPlot -&gt; Int
+</span><span class="hs-identifier hs-var hs-var">nutNumPoints</span></span><span> </span><span class="annot"><span class="annottext">(NutPlot -&gt; CInt) -&gt; IO NutPlot -&gt; IO CInt
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot -&gt; IO NutPlot
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043791"><span class="hs-identifier hs-var">plt</span></a></span><span>
+</span><span id="line-114"></span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- | Nut Plot Wave by Variable Name</span><span>
+</span><span id="line-116"></span><span class="annot"><a href="SharedSpectre.html#waveByName"><span class="hs-identifier hs-type">waveByName</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutWave</span></span><span class="hs-special">)</span><span>
+</span><span id="line-117"></span><span id="waveByName"><span class="annot"><span class="annottext">waveByName :: StablePtr NutPlot -&gt; CString -&gt; IO (StablePtr NutWave)
+</span><a href="SharedSpectre.html#waveByName"><span class="hs-identifier hs-var hs-var">waveByName</span></a></span></span><span> </span><span id="local-6989586621679043789"><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043789"><span class="hs-identifier hs-var">plt</span></a></span></span><span> </span><span id="local-6989586621679043788"><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043788"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-118"></span><span>    </span><span id="local-6989586621679043787"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679043787"><span class="hs-identifier hs-var">name'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">CString -&gt; IO String
+</span><span class="hs-identifier hs-var">peekCString</span></span><span> </span><span class="annot"><span class="annottext">CString
+</span><a href="#local-6989586621679043788"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-119"></span><span>    </span><span id="local-6989586621679043786"><span class="annot"><span class="annottext">NutWave
+</span><a href="#local-6989586621679043786"><span class="hs-identifier hs-var">plt'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe NutWave -&gt; NutWave
+forall a. HasCallStack =&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromJust</span></span><span> </span><span class="annot"><span class="annottext">(Maybe NutWave -&gt; NutWave)
+-&gt; (NutPlot -&gt; Maybe NutWave) -&gt; NutPlot -&gt; NutWave
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Map String NutWave -&gt; Maybe NutWave
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">M.lookup</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679043787"><span class="hs-identifier hs-var">name'</span></a></span><span> </span><span class="annot"><span class="annottext">(Map String NutWave -&gt; Maybe NutWave)
+-&gt; (NutPlot -&gt; Map String NutWave) -&gt; NutPlot -&gt; Maybe NutWave
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">NutPlot -&gt; Map String NutWave
+</span><span class="hs-identifier hs-var hs-var">nutData</span></span><span> </span><span class="annot"><span class="annottext">(NutPlot -&gt; NutWave) -&gt; IO NutPlot -&gt; IO NutWave
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot -&gt; IO NutPlot
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043789"><span class="hs-identifier hs-var">plt</span></a></span><span>
+</span><span id="line-120"></span><span>    </span><span class="annot"><span class="annottext">NutWave -&gt; IO (StablePtr NutWave)
+forall a. a -&gt; IO (StablePtr a)
+</span><span class="hs-identifier hs-var">newStablePtr</span></span><span> </span><span class="annot"><span class="annottext">NutWave
+</span><a href="#local-6989586621679043786"><span class="hs-identifier hs-var">plt'</span></a></span><span>
+</span><span id="line-121"></span><span>
+</span><span id="line-122"></span><span class="hs-comment">-- | Nut Plot Wave by Variable Index</span><span>
+</span><span id="line-123"></span><span class="annot"><a href="SharedSpectre.html#waveByIndex"><span class="hs-identifier hs-type">waveByIndex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutWave</span></span><span class="hs-special">)</span><span>
+</span><span id="line-124"></span><span id="waveByIndex"><span class="annot"><span class="annottext">waveByIndex :: StablePtr NutPlot -&gt; CInt -&gt; IO (StablePtr NutWave)
+</span><a href="SharedSpectre.html#waveByIndex"><span class="hs-identifier hs-var hs-var">waveByIndex</span></a></span></span><span> </span><span id="local-6989586621679043784"><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043784"><span class="hs-identifier hs-var">plt</span></a></span></span><span> </span><span id="local-6989586621679043783"><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043783"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot -&gt; CInt -&gt; IO CString
+</span><a href="SharedSpectre.html#nameOfVar"><span class="hs-identifier hs-var">nameOfVar</span></a></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043784"><span class="hs-identifier hs-var">plt</span></a></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><a href="#local-6989586621679043783"><span class="hs-identifier hs-var">idx</span></a></span><span> </span><span class="annot"><span class="annottext">IO CString
+-&gt; (CString -&gt; IO (StablePtr NutWave)) -&gt; IO (StablePtr NutWave)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot -&gt; CString -&gt; IO (StablePtr NutWave)
+</span><a href="SharedSpectre.html#waveByName"><span class="hs-identifier hs-var">waveByName</span></a></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043784"><span class="hs-identifier hs-var">plt</span></a></span><span>
+</span><span id="line-125"></span><span>
+</span><span id="line-126"></span><span class="hs-comment">-- | Is Complex? 1 = True, 0 = False</span><span>
+</span><span id="line-127"></span><span class="annot"><a href="SharedSpectre.html#isComplex"><span class="hs-identifier hs-type">isComplex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-128"></span><span id="isComplex"><span class="annot"><span class="annottext">isComplex :: StablePtr NutPlot -&gt; IO CInt
+</span><a href="SharedSpectre.html#isComplex"><span class="hs-identifier hs-var hs-var">isComplex</span></a></span></span><span> </span><span id="local-6989586621679043782"><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043782"><span class="hs-identifier hs-var">plt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-129"></span><span>    </span><span id="local-6989586621679043781"><span class="annot"><span class="annottext">NutPlot
+</span><a href="#local-6989586621679043781"><span class="hs-identifier hs-var">plt'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot -&gt; IO NutPlot
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutPlot
+</span><a href="#local-6989586621679043782"><span class="hs-identifier hs-var">plt</span></a></span><span>
+</span><span id="line-130"></span><span>    </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">NutPlot -&gt; NutPlotType
+</span><span class="hs-identifier hs-var hs-var">nutPlotType</span></span><span> </span><span class="annot"><span class="annottext">NutPlot
+</span><a href="#local-6989586621679043781"><span class="hs-identifier hs-var">plt'</span></a></span><span> </span><span class="annot"><span class="annottext">NutPlotType -&gt; NutPlotType -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">NutPlotType
+</span><span class="hs-identifier hs-var">NutComplexPlot</span></span><span>
+</span><span id="line-131"></span><span>       </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">CInt -&gt; IO CInt
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-132"></span><span>       </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">CInt -&gt; IO CInt
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">CInt
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span class="hs-comment">-- | Real Part of a Vector</span><span>
+</span><span id="line-135"></span><span class="annot"><a href="SharedSpectre.html#realData"><span class="hs-identifier hs-type">realData</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutWave</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CDouble</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-136"></span><span id="realData"><span class="annot"><span class="annottext">realData :: StablePtr NutWave -&gt; Ptr CDouble -&gt; IO ()
+</span><a href="SharedSpectre.html#realData"><span class="hs-identifier hs-var hs-var">realData</span></a></span></span><span> </span><span id="local-6989586621679043778"><span class="annot"><span class="annottext">StablePtr NutWave
+</span><a href="#local-6989586621679043778"><span class="hs-identifier hs-var">wav</span></a></span></span><span> </span><span id="local-6989586621679043777"><span class="annot"><span class="annottext">Ptr CDouble
+</span><a href="#local-6989586621679043777"><span class="hs-identifier hs-var">arr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-137"></span><span>    </span><span id="local-6989586621679043776"><span class="annot"><span class="annottext">NutWave
+</span><a href="#local-6989586621679043776"><span class="hs-identifier hs-var">wav'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StablePtr NutWave -&gt; IO NutWave
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutWave
+</span><a href="#local-6989586621679043778"><span class="hs-identifier hs-var">wav</span></a></span><span>
+</span><span id="line-138"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679043775"><span class="annot"><span class="annottext">dat :: [CDouble]
+</span><a href="#local-6989586621679043775"><span class="hs-identifier hs-var hs-var">dat</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Vector (Complex Double) -&gt; [CDouble])
+-&gt; (Vector Double -&gt; [CDouble])
+-&gt; Either (Vector (Complex Double)) (Vector Double)
+-&gt; [CDouble]
+forall a c b. (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c
+</span><span class="hs-identifier hs-var">either</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Complex Double -&gt; CDouble) -&gt; [Complex Double] -&gt; [CDouble]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Double -&gt; CDouble
+</span><span class="hs-identifier hs-var">CDouble</span></span><span> </span><span class="annot"><span class="annottext">(Double -&gt; CDouble)
+-&gt; (Complex Double -&gt; Double) -&gt; Complex Double -&gt; CDouble
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Complex Double -&gt; Double
+forall a. Complex a -&gt; a
+</span><span class="hs-identifier hs-var">realPart</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Complex Double] -&gt; [CDouble])
+-&gt; (Vector (Complex Double) -&gt; [Complex Double])
+-&gt; Vector (Complex Double)
+-&gt; [CDouble]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Vector (Complex Double) -&gt; [Complex Double]
+forall a. Unbox a =&gt; Vector a -&gt; [a]
+</span><span class="hs-identifier hs-var">V.toList</span></span><span class="hs-special">)</span><span> </span><span>
+</span><span id="line-139"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Double -&gt; CDouble) -&gt; [Double] -&gt; [CDouble]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Double -&gt; CDouble
+</span><span class="hs-identifier hs-var">CDouble</span></span><span> </span><span class="annot"><span class="annottext">([Double] -&gt; [CDouble])
+-&gt; (Vector Double -&gt; [Double]) -&gt; Vector Double -&gt; [CDouble]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Vector Double -&gt; [Double]
+forall a. Unbox a =&gt; Vector a -&gt; [a]
+</span><span class="hs-identifier hs-var">V.toList</span></span><span class="hs-special">)</span><span> </span><span>
+</span><span id="line-140"></span><span>                     </span><span class="annot"><span class="annottext">(Either (Vector (Complex Double)) (Vector Double) -&gt; [CDouble])
+-&gt; Either (Vector (Complex Double)) (Vector Double) -&gt; [CDouble]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NutWave -&gt; Either (Vector (Complex Double)) (Vector Double)
+</span><span class="hs-identifier hs-var">nutWave</span></span><span> </span><span class="annot"><span class="annottext">NutWave
+</span><a href="#local-6989586621679043776"><span class="hs-identifier hs-var">wav'</span></a></span><span>
+</span><span id="line-141"></span><span>    </span><span class="annot"><span class="annottext">Ptr CDouble -&gt; [CDouble] -&gt; IO ()
+forall a. Storable a =&gt; Ptr a -&gt; [a] -&gt; IO ()
+</span><span class="hs-identifier hs-var">pokeArray</span></span><span> </span><span class="annot"><span class="annottext">Ptr CDouble
+</span><a href="#local-6989586621679043777"><span class="hs-identifier hs-var">arr</span></a></span><span> </span><span class="annot"><span class="annottext">[CDouble]
+</span><a href="#local-6989586621679043775"><span class="hs-identifier hs-var">dat</span></a></span><span>
+</span><span id="line-142"></span><span>
+</span><span id="line-143"></span><span class="hs-comment">-- | Imaginary Part of vector or empty list if only real</span><span>
+</span><span id="line-144"></span><span class="annot"><a href="SharedSpectre.html#imagData"><span class="hs-identifier hs-type">imagData</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutWave</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CDouble</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-145"></span><span id="imagData"><span class="annot"><span class="annottext">imagData :: StablePtr NutWave -&gt; Ptr CDouble -&gt; IO ()
+</span><a href="SharedSpectre.html#imagData"><span class="hs-identifier hs-var hs-var">imagData</span></a></span></span><span> </span><span id="local-6989586621679043768"><span class="annot"><span class="annottext">StablePtr NutWave
+</span><a href="#local-6989586621679043768"><span class="hs-identifier hs-var">wav</span></a></span></span><span> </span><span id="local-6989586621679043767"><span class="annot"><span class="annottext">Ptr CDouble
+</span><a href="#local-6989586621679043767"><span class="hs-identifier hs-var">arr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-146"></span><span>    </span><span id="local-6989586621679043766"><span class="annot"><span class="annottext">NutWave
+</span><a href="#local-6989586621679043766"><span class="hs-identifier hs-var">wav'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StablePtr NutWave -&gt; IO NutWave
+forall a. StablePtr a -&gt; IO a
+</span><span class="hs-identifier hs-var">deRefStablePtr</span></span><span> </span><span class="annot"><span class="annottext">StablePtr NutWave
+</span><a href="#local-6989586621679043768"><span class="hs-identifier hs-var">wav</span></a></span><span>
+</span><span id="line-147"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679043765"><span class="annot"><span class="annottext">dat :: [CDouble]
+</span><a href="#local-6989586621679043765"><span class="hs-identifier hs-var hs-var">dat</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Vector (Complex Double) -&gt; [CDouble])
+-&gt; (Vector Double -&gt; [CDouble])
+-&gt; Either (Vector (Complex Double)) (Vector Double)
+-&gt; [CDouble]
+forall a c b. (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c
+</span><span class="hs-identifier hs-var">either</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Complex Double -&gt; CDouble) -&gt; [Complex Double] -&gt; [CDouble]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Double -&gt; CDouble
+</span><span class="hs-identifier hs-var">CDouble</span></span><span> </span><span class="annot"><span class="annottext">(Double -&gt; CDouble)
+-&gt; (Complex Double -&gt; Double) -&gt; Complex Double -&gt; CDouble
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Complex Double -&gt; Double
+forall a. Complex a -&gt; a
+</span><span class="hs-identifier hs-var">imagPart</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Complex Double] -&gt; [CDouble])
+-&gt; (Vector (Complex Double) -&gt; [Complex Double])
+-&gt; Vector (Complex Double)
+-&gt; [CDouble]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Vector (Complex Double) -&gt; [Complex Double]
+forall a. Unbox a =&gt; Vector a -&gt; [a]
+</span><span class="hs-identifier hs-var">V.toList</span></span><span class="hs-special">)</span><span> </span><span>
+</span><span id="line-148"></span><span>                     </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[CDouble] -&gt; Vector Double -&gt; [CDouble]
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span>
+</span><span id="line-149"></span><span>                     </span><span class="annot"><span class="annottext">(Either (Vector (Complex Double)) (Vector Double) -&gt; [CDouble])
+-&gt; Either (Vector (Complex Double)) (Vector Double) -&gt; [CDouble]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NutWave -&gt; Either (Vector (Complex Double)) (Vector Double)
+</span><span class="hs-identifier hs-var">nutWave</span></span><span> </span><span class="annot"><span class="annottext">NutWave
+</span><a href="#local-6989586621679043766"><span class="hs-identifier hs-var">wav'</span></a></span><span>
+</span><span id="line-150"></span><span>    </span><span class="annot"><span class="annottext">Ptr CDouble -&gt; [CDouble] -&gt; IO ()
+forall a. Storable a =&gt; Ptr a -&gt; [a] -&gt; IO ()
+</span><span class="hs-identifier hs-var">pokeArray</span></span><span> </span><span class="annot"><span class="annottext">Ptr CDouble
+</span><a href="#local-6989586621679043767"><span class="hs-identifier hs-var">arr</span></a></span><span> </span><span class="annot"><span class="annottext">[CDouble]
+</span><a href="#local-6989586621679043765"><span class="hs-identifier hs-var">dat</span></a></span><span>
+</span><span id="line-151"></span><span>
+</span><span id="line-152"></span><span class="hs-comment">-- Spectre Exports</span><span>
+</span><span id="line-153"></span><span>
+</span><span id="line-154"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#version"><span class="hs-identifier hs-type">version</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span>
+</span><span id="line-155"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#simulate"><span class="hs-identifier hs-type">simulate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span>
+</span><span id="line-156"></span><span>                              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span class="hs-special">)</span><span>
+</span><span id="line-157"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#startSession"><span class="hs-identifier hs-type">startSession</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span>
+</span><span id="line-158"></span><span>                                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SI.Session</span></span><span class="hs-special">)</span><span>
+</span><span id="line-159"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#stopSession"><span class="hs-identifier hs-type">stopSession</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">SI.Session</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-160"></span><span>
+</span><span id="line-161"></span><span class="hs-comment">-- Nutmeg Exports</span><span>
+</span><span id="line-162"></span><span>
+</span><span id="line-163"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#numOfPlots"><span class="hs-identifier hs-type">numOfPlots</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-164"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#nameOfPlot"><span class="hs-identifier hs-type">nameOfPlot</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span>
+</span><span id="line-165"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#plotByName"><span class="hs-identifier hs-type">plotByName</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span class="hs-special">)</span><span>
+</span><span id="line-166"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#plotByIndex"><span class="hs-identifier hs-type">plotByIndex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutMeg</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span class="hs-special">)</span><span>
+</span><span id="line-167"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#numOfVars"><span class="hs-identifier hs-type">numOfVars</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-168"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#nameOfVar"><span class="hs-identifier hs-type">nameOfVar</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span>
+</span><span id="line-169"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#numOfPoints"><span class="hs-identifier hs-type">numOfPoints</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-170"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#waveByName"><span class="hs-identifier hs-type">waveByName</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CString</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutWave</span></span><span class="hs-special">)</span><span>
+</span><span id="line-171"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#waveByIndex"><span class="hs-identifier hs-type">waveByIndex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutWave</span></span><span class="hs-special">)</span><span>
+</span><span id="line-172"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#isComplex"><span class="hs-identifier hs-type">isComplex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutPlot</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CInt</span></span><span>
+</span><span id="line-173"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#realData"><span class="hs-identifier hs-type">realData</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutWave</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CDouble</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-174"></span><span class="hs-keyword">foreign</span><span> </span><span class="hs-keyword">export</span><span> </span><span class="annot"><span class="hs-keyword">ccall</span></span><span> </span><span class="annot"><a href="SharedSpectre.html#imagData"><span class="hs-identifier hs-type">imagData</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StablePtr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">NutWave</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ptr</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CDouble</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-175"></span></pre></body></html>

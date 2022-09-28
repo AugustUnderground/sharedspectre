@@ -1,0 +1,13 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "sharedspectre:lib"
+
+    - path: "./app/Main.hs"
+      component: "hspectre:exe:sharedspectre-exe"
+
+    - path: "./app/Paths_sharedspectre.hs"
+      component: "sharedspectre:exe:sharedspectre-exe"
+
+    - path: "./test"
+      component: "sharedspectre:test:sharedspectre-test"

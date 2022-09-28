@@ -1,0 +1,26 @@
+resolver: lts-18.6
+compiler: ghc-8.10.4
+
+packages:
+- .
+
+  # ghc-options:
+  #   "$locals": -funfolding-use-threshold=16 -fexcess-precision -optc-O3 -optc-ffast-math -O2 # -v
+
+  # apply-ghc-options: locals
+
+  # allow-newer: true
+
+extra-deps:
+  - posix-pty-0.2.2@sha256:dd777df258b3b95fe01612c1204cde972ad1323c3289591ecc844ecb29e55e2b,1826
+  - command-0.1.1@sha256:5232b98c195bc3b8a6f35c55ccd2fa424abe355ca54cfcd836bbe7e494834773,1110
+  - KMP-0.2.0.0@sha256:6dfbac03ef00ebd9347234732cb86a40f62ab5a80c0cc6bedb8eb51766f7df28,2562
+  - hmatrix-csv-0.1.0.2@sha256:687460573413dbb23ba3eeff95e9fac342a2d439db1006846767a095e7f23356,1031
+  - git: https://github.com/AugustUnderground/hnutmeg.git
+    commit: 310c1384cd2509635be3a79d776d131af112a723
+  - git: https://github.com/AugustUnderground/hspectre.git
+    commit: e7d1394d4e3ac210e87887af64caee732eb17c68
+
+extra-include-dirs: []
+
+extra-lib-dirs: []
